@@ -1,0 +1,16 @@
+{
+    "name": "xin_manager",
+    "private": true,
+    "workspaces": [
+        "web",
+        "server"
+    ],
+    "devDependencies": {
+        "concurrently": "^9.2.0"
+    },
+    "scripts": {
+        "dev:nuxt": "npm --workspace web run dev",
+        "dev:nest": "npm --workspace server run start:dev",
+        "dev": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:dev:nuxt\" \"npm:dev:nest\""
+    }
+}
