@@ -5,6 +5,8 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/server/.idea" />
+      <excludeFolder url="file://$MODULE_DIR$/web/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/web/.output" />
     </content>
     <orderEntry type="inheritedJdk" />
