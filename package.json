@@ -11,6 +11,9 @@
     "scripts": {
         "dev:nuxt": "npm --workspace web run dev",
         "dev:nest": "npm --workspace server run start:dev",
-        "dev": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:dev:nuxt\" \"npm:dev:nest\""
+        "dev": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:dev:nuxt\" \"npm:dev:nest\"",
+        "build:nuxt": "npm --workspace web run build",
+        "build:nest": "npm --workspace server run build",
+        "build": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:build:nuxt\" \"npm:build:nest\""
     }
 }
