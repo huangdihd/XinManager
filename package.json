@@ -14,6 +14,12 @@
         "dev": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:dev:nuxt\" \"npm:dev:nest\"",
         "build:nuxt": "npm --workspace web run build",
         "build:nest": "npm --workspace server run build",
-        "build": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:build:nuxt\" \"npm:build:nest\""
+        "build": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:build:nuxt\" \"npm:build:nest\"",
+        "start:nuxt": "npm --workspace web run start",
+        "start:nest": "npm --workspace server run start:prod",
+        "start": "concurrently -n NUXT,NEST -c cyan,magenta \"npm:start:nuxt\" \"npm:start:nest\"",
+        "lint": "npm --workspace web run lint",
+        "format": "npm --workspace web run format",
+        "test": "npm --workspace web run test"
     }
 }
