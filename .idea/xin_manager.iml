@@ -8,6 +8,8 @@
       <excludeFolder url="file://$MODULE_DIR$/server/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/web/.idea" />
       <excludeFolder url="file://$MODULE_DIR$/web/.output" />
+      <excludeFolder url="file://$MODULE_DIR$/package_temp" />
+      <excludeFolder url="file://$MODULE_DIR$/.output" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
