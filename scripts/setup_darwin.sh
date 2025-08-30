@@ -53,9 +53,9 @@ install_node() {
   echo "删除node压缩包"
   rm node.tar.gz || { echo "删除node压缩包失败"; exit 1; }
   echo "移动node文件"
-  mv "node-$node_version-linux-$arch"/* . || { echo "移动node文件失败"; exit 1; }
+  mv "node-$node_version-darwin-$arch"/* . || { echo "移动node文件失败"; exit 1; }
   echo "删除node缓存目录"
-  rm -rf "node-$node_version-linux-$arch" || { echo "删除node缓存目录失败"; exit 1; }
+  rm -rf "node-$node_version-darwin-$arch" || { echo "删除node缓存目录失败"; exit 1; }
   echo "node安装完成"
 }
 
