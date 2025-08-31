@@ -174,7 +174,7 @@ goto :main
 
     echo ÅäÖÃÎÄ¼şµØÖ·: %xinManager_install_path%\config.json
 
-    cat %xinManager_install_path%\config.json
+    type %xinManager_install_path%\config.json
 
     exit /b 0
 
