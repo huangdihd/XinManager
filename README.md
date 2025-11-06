@@ -48,7 +48,7 @@ sudo su -c "wget -qO- https://raw.githubusercontent.com/huangdihd/xinManager/mas
 
 #### macOS
 ```bash
-sudo su -c "wget -qO- https://raw.githubusercontent.com/huangdihd/xinManager/master/scripts/setup_darwin.sh | bash"
+sudo sh -c "wget -qO- https://raw.githubusercontent.com/huangdihd/xinManager/master/scripts/setup_darwin.sh | bash"
 ```
 
 #### Windows
