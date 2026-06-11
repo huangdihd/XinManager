@@ -53,7 +53,7 @@ sudo sh -c "wget -qO- https://raw.githubusercontent.com/huangdihd/xinManager/mas
 
 #### Windows
 ```cmd
-curl -sSL -o setup_win.bat https://raw.githubusercontent.com/huangdihd/xinManager/master/scripts/setup_win.bat && more < setup_win.bat > setup_win_crlf.bat && del setup_win.bat && call setup_win_crlf.bat && del setup_win_crlf.bat
+curl -sSL -o setup_win.bat https://raw.githubusercontent.com/huangdihd/xinManager/master/scripts/setup_win.bat && call setup_win.bat && del setup_win.bat
 ```
 
 👉 The setup script will install xinManager as a **service**.  

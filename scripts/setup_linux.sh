@@ -40,7 +40,7 @@ install_node() {
     ppc64le) arch="ppc64le" ;;
     s390x)   arch="s390x" ;;
     *)
-      err "不支持的架构：$(uname -m)。请手动安装 Node。"
+      echo "不支持的架构：$(uname -m)。请手动安装 Node。"
       exit 1
       ;;
   esac
@@ -104,6 +104,7 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
+command -v unzip > /dev/null 2>&1 || { echo "未找到 unzip 命令, 请先安装 (例如: apt install unzip 或 yum install unzip)"; exit 1; }
 
 echo "开始安装xinManager"
 echo "安装目录: $xinManager_install_path"
@@ -111,7 +112,7 @@ echo "安装目录: $xinManager_install_path"
 # 检查是否已安装xinManager
 if [ -d "$xinManager_install_path" ]; then
     echo "xinManager已安装"
-    read -r -p "是否进行卸载, 该操作不会删除数据(y/n)" uninstall
+    read -r -p "是否进行卸载, 该操作不会删除数据(y/n)" uninstall < /dev/tty
     if [ "$uninstall" = "y" ]; then
         uninstall_xinManager
     else
@@ -209,4 +210,13 @@ echo "访问 http://localhost:3000 即可开始使用"
 
 echo "配置文件地址: $xinManager_install_path/config.json"
 
-cat "$xinManager_install_path/config.json"
+# config.json 由应用首次启动时生成, 等待服务启动
+for _ in $(seq 1 30); do
+  [ -f "$xinManager_install_path/config.json" ] && break
+  sleep 1
+done
+if [ -f "$xinManager_install_path/config.json" ]; then
+  cat "$xinManager_install_path/config.json"
+else
+  echo "config.json 尚未生成, 服务首次启动后会自动创建"
+fi

@@ -48,7 +48,7 @@ goto :main
     echo 开始卸载xinManager
     if exist "%xinManager_install_path%\XinManagerSvc.exe" (
         echo 找到服务文件,尝试停止服务
-        "%xinManager_install_path%\XinManagerSvc.exe" stop || ( echo 停止服务失败 & exit /b 1 )
+        "%xinManager_install_path%\XinManagerSvc.exe" stop >nul 2>&1
         echo 服务已停止,尝试删除服务
         "%xinManager_install_path%\XinManagerSvc.exe" uninstall || ( echo 删除服务失败 & exit /b 1 )
         echo 服务已删除
@@ -72,13 +72,16 @@ goto :main
     exit /b 0
 
 :pnpm_install
-    pnpm install || ( echo 安装依赖失败 & pause & exit /b 1 )
+    pnpm install --dangerously-allow-all-builds || ( echo 安装依赖失败 & pause & exit /b 1 )
+    exit /b 0
 
 :generate_prisma_client
     pnpm prisma generate --schema=./prisma/schema.prisma || ( echo 生成prisma client失败 & pause & exit /b 1 )
+    exit /b 0
 
 :push_prisma_db
     pnpm prisma db push --schema=./prisma/schema.prisma || ( echo 推送prisma db失败 & pause & exit /b 1 )
+    exit /b 0
 
 :setup_service
     if not %arch%==x64 if not %arch%==x86 (
@@ -126,7 +129,7 @@ goto :main
     )
     if not exist "%node_install_path%/node.exe" (
         echo node未安装
-        rmdir /s /q "%node_install_path%"
+        rmdir /s /q "%node_install_path%" 2>nul
         call :install_node || ( echo 安装node失败 & exit /b 1 )
     ) else (
         echo node已安装,跳过安装过程
@@ -155,7 +158,6 @@ goto :main
     call :push_prisma_db || ( echo 推送prisma db失败 & pause & exit /b 1 )
 
 
-    cd /d .. || ( echo 进入总项目目录失败 & exit /b 1 )
 
     echo 生成启动脚本
     echo @echo off > start.bat

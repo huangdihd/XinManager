@@ -12,7 +12,7 @@ if /i not "!uninstall!"=="y" (
 echo 开始卸载xinManager
 if exist "%xinManager_install_path%\XinManagerSvc.exe" (
     echo 找到服务文件,尝试停止服务
-    "%xinManager_install_path%\XinManagerSvc.exe" stop || ( echo 停止服务失败 & exit /b 1 )
+    "%xinManager_install_path%\XinManagerSvc.exe" stop >nul 2>&1
     echo 服务已停止,尝试删除服务
     "%xinManager_install_path%\XinManagerSvc.exe" uninstall || ( echo 删除服务失败 & exit /b 1 )
     echo 服务已删除

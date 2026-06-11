@@ -24,7 +24,7 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-read -r -p "是否进行卸载, 该操作会删除数据和配置文件(y/n)" uninstall
+read -r -p "是否进行卸载, 该操作会删除数据和配置文件(y/n)" uninstall < /dev/tty
   if [ ! "$uninstall" = "y" ]; then
     echo "取消卸载"
     exit 0
@@ -32,11 +32,24 @@ read -r -p "是否进行卸载, 该操作会删除数据和配置文件(y/n)" un
 
 cd "$xinManager_install_path" || { echo "进入安装目录失败"; exit 1; }
 echo "开始卸载xinManager"
-if launchctl list | grep -q "xin.bbtt.xinmanager"; then
+if systemctl list-unit-files | grep -q "^xinmanager.service"; then
   echo "找到xinManager服务文件"
-  launchctl unload ~/Library/LaunchAgents/xin.bbtt.xinmanager.plist || true
-  rm -f ~/Library/LaunchAgents/xin.bbtt.xinmanager.plist
+  if systemctl is-active --quiet "xinmanager.service"; then
+    echo "xinManager服务正在运行, 尝试停止"
+    systemctl stop xinmanager.service || { echo "停止xinManager服务失败"; exit 1; }
+  fi
+  echo "xinManager服务已停止"
+  echo "尝试禁用xinManager服务"
+  systemctl disable xinmanager.service || { echo "禁用xinManager服务失败"; exit 1; }
+  echo "xinManager服务已禁用"
+  echo "尝试删除xinManager服务文件"
+  rm -f /etc/systemd/system/xinmanager.service || { echo "删除xinManager服务文件失败"; exit 1; }
+  echo "xinManager服务文件已删除"
+  echo "尝试重新加载systemd"
+  systemctl daemon-reload || { echo "重新加载systemd失败"; exit 1; }
+  echo "systemd已重新加载"
 fi
-rm -rf "$xinManager_install_path"
+echo "删除xinManager文件"
+rm -rf "$xinManager_install_path" || { echo "删除xinManager文件失败"; exit 1; }
 echo "xinManager文件已删除"
 echo "卸载完成"

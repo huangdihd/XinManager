@@ -1,2 +1,3 @@
-*.bat text eol=crlf
+# bat 按二进制入库, 保留 CRLF 和 GBK 编码原始字节, raw 下载即可直接执行
+*.bat -text
 *.sh text eol=lf

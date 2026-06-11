@@ -37,7 +37,7 @@ install_node() {
     x86_64)  arch="x64" ;;
     arm64) arch="arm64" ;;
     *)
-      err "不支持的架构：$(uname -m)。请手动安装 Node。"
+      echo "不支持的架构：$(uname -m)。请手动安装 Node。"
       exit 1
       ;;
   esac
@@ -68,11 +68,14 @@ install_pnpm() {
 uninstall_xinManager() {
   cd "$xinManager_install_path" || { echo "进入安装目录失败"; exit 1; }
   echo "开始卸载xinManager"
-  if launchctl list | grep -q "xin.bbtt.xinmanager"; then
-    echo "找到xinManager服务文件"
-    launchctl unload ~/Library/LaunchAgents/xin.bbtt.xinmanager.plist || true
-    rm -f ~/Library/LaunchAgents/xin.bbtt.xinmanager.plist
+  if launchctl print system/xin.bbtt.xinmanager > /dev/null 2>&1; then
+    echo "找到xinManager服务, 尝试停止"
+    launchctl bootout system/xin.bbtt.xinmanager || true
   fi
+  rm -f /Library/LaunchDaemons/xin.bbtt.xinmanager.plist
+  # 清理旧版本错误安装到 root LaunchAgents 的服务
+  launchctl unload /var/root/Library/LaunchAgents/xin.bbtt.xinmanager.plist 2>/dev/null || true
+  rm -f /var/root/Library/LaunchAgents/xin.bbtt.xinmanager.plist
   find . -mindepth 1 \
     ! -path './config.json' \
     ! -path './prisma/bots.db' \
@@ -96,7 +99,7 @@ echo "安装目录: $xinManager_install_path"
 # 检查是否已安装xinManager
 if [ -d "$xinManager_install_path" ]; then
     echo "xinManager已安装"
-    read -r -p "是否进行卸载, 该操作不会删除数据(y/n)" uninstall
+    read -r -p "是否进行卸载, 该操作不会删除数据(y/n)" uninstall < /dev/tty
     if [ "$uninstall" = "y" ]; then
         uninstall_xinManager
     else
@@ -156,7 +159,7 @@ echo "启动脚本位于:$xinManager_install_path/start.sh"
 
 echo "使用launchd管理xinManager"
 
-plist=~/Library/LaunchAgents/xin.bbtt.xinmanager.plist
+plist=/Library/LaunchDaemons/xin.bbtt.xinmanager.plist
 cat > "$plist" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
@@ -177,15 +180,15 @@ cat > "$plist" <<EOF
 </plist>
 EOF
 
+chown root:wheel "$plist" || { echo "设置服务文件所有者失败"; exit 1; }
+chmod 644 "$plist" || { echo "设置服务文件权限失败"; exit 1; }
+
 echo "xinManager 服务创建成功"
 
-launchctl load "$plist" || { echo "加载xinManager服务失败"; exit 1; }
-launchctl start xin.bbtt.xinmanager || { echo "启动xinManager服务失败"; exit 1; }
+launchctl bootout system/xin.bbtt.xinmanager 2>/dev/null || true
+launchctl bootstrap system "$plist" || { echo "加载xinManager服务失败"; exit 1; }
 
-systemctl enable xinmanager.service || { echo "启用xinManager服务失败"; exit 1; }
-systemctl start xinmanager.service || { echo "启动xinManager服务失败"; exit 1; }
-
-echo "xinManager 服务已启动, 可以使用 launchctl list | grep xin.bbtt.xinmanager 查看服务状态"
+echo "xinManager 服务已启动, 可以使用 sudo launchctl print system/xin.bbtt.xinmanager 查看服务状态"
 
 echo "xinManager安装完成"
 
@@ -193,5 +196,14 @@ echo "访问 http://[服务器ip]:3000 即可开始使用"
 
 echo "配置文件地址: $xinManager_install_path/config.json"
 
-cat "$xinManager_install_path/config.json"
+# config.json 由应用首次启动时生成, 等待服务启动
+for _ in $(seq 1 30); do
+  [ -f "$xinManager_install_path/config.json" ] && break
+  sleep 1
+done
+if [ -f "$xinManager_install_path/config.json" ]; then
+  cat "$xinManager_install_path/config.json"
+else
+  echo "config.json 尚未生成, 服务首次启动后会自动创建"
+fi
 
