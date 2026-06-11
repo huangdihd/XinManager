@@ -80,10 +80,6 @@ uninstall_xinManager() {
     ! -path './node/*' \
     ! -path './node_modules' \
     ! -path './node_modules/*' \
-    ! -path './web/node_modules' \
-    ! -path './web/node_modules/*' \
-    ! -path './server/node_modules' \
-    ! -path './server/node_modules/*' \
     -exec rm -rf {} + >> /dev/null
   echo "卸载完成(未删除node相关文件,若需要删除请手动运行\"sudo rm -rf $xinManager_install_path\")"
 }
@@ -139,20 +135,14 @@ curl -L -o xinManager.zip "$xinManager_download_addr" || { echo "下载xinManage
 echo "解压xinManager"
 unzip xinManager.zip -d . -x "prisma/bots.db" "config.json" >> /dev/null || { echo "解压xinManager失败"; exit 1; }
 
-echo "安装server依赖"
-cd server || { echo "进入server目录失败"; exit 1; }
-$pnpm_command install --dangerously-allow-all-builds || { echo "安装server依赖失败"; exit 1; }
+echo "安装依赖"
+$pnpm_command install --dangerously-allow-all-builds || { echo "安装依赖失败"; exit 1; }
 
 echo "生成prisma client"
-PATH="$node_install_path/bin:$PATH" $pnpm_command prisma generate --schema=../prisma/schema.prisma || { echo "生成prisma client失败"; exit 1; }
+PATH="$node_install_path/bin:$PATH" $pnpm_command prisma generate --schema=./prisma/schema.prisma || { echo "生成prisma client失败"; exit 1; }
 
 echo "推送prisma db"
-PATH="$node_install_path/bin:$PATH" $pnpm_command prisma db push --schema=../prisma/schema.prisma || { echo "推送prisma db失败"; exit 1; }
-
-cd ..
-
-echo "安装总项目依赖"
-$pnpm_command install || { echo "安装总项目依赖失败"; exit 1; }
+PATH="$node_install_path/bin:$PATH" $pnpm_command prisma db push --schema=./prisma/schema.prisma || { echo "推送prisma db失败"; exit 1; }
 
 echo "生成启动脚本"
 cat << EOF > start.sh || { echo "生成启动脚本失败"; exit 1; }

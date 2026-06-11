@@ -1,0 +1,7 @@
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
+  - canvas
+
+patchedDependencies:
+  prismarine-viewer@1.33.0: patches/prismarine-viewer@1.33.0.patch

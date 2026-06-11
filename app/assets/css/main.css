@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/* 组件放在项目根的 composables/ 目录（app/ 之外），需手动加入 Tailwind 扫描范围 */
+@source "../../../composables";

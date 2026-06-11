@@ -75,10 +75,10 @@ goto :main
     pnpm install || ( echo °²×°ÒÀÀµÊ§°Ü & pause & exit /b 1 )
 
 :generate_prisma_client
-    pnpm prisma generate --schema=../prisma/schema.prisma || ( echo Éú³Éprisma clientÊ§°Ü & pause & exit /b 1 )
+    pnpm prisma generate --schema=./prisma/schema.prisma || ( echo Éú³Éprisma clientÊ§°Ü & pause & exit /b 1 )
 
 :push_prisma_db
-    pnpm prisma db push --schema=../prisma/schema.prisma || ( echo ÍÆËÍprisma dbÊ§°Ü & pause & exit /b 1 )
+    pnpm prisma db push --schema=./prisma/schema.prisma || ( echo ÍÆËÍprisma dbÊ§°Ü & pause & exit /b 1 )
 
 :setup_service
     if not %arch%==x64 if not %arch%==x86 (
@@ -145,9 +145,8 @@ goto :main
     tar -xf xinManager.zip || ( echo ½âÑ¹xinManagerÊ§°Ü & exit /b 1 )
     echo É¾³ıxinManagerÑ¹Ëõ°ü
     del xinManager.zip || ( echo É¾³ıxinManagerÑ¹Ëõ°üÊ§°Ü & exit /b 1 )
-    echo °²×°serverÒÀÀµ
-    cd /d server || ( echo ½øÈëserverÄ¿Â¼Ê§°Ü & pause & exit /b 1 )
-    call :pnpm_install || ( echo °²×°serverÒÀÀµÊ§°Ü & pause & exit /b 1 )
+    echo °²×°ÒÀÀµ
+    call :pnpm_install || ( echo °²×°ÒÀÀµÊ§°Ü & pause & exit /b 1 )
 
     echo Éú³Éprisma client
     call :generate_prisma_client || ( echo Éú³Éprisma clientÊ§°Ü & pause & exit /b 1 )
@@ -156,9 +155,7 @@ goto :main
     call :push_prisma_db || ( echo ÍÆËÍprisma dbÊ§°Ü & pause & exit /b 1 )
 
 
-    echo °²×°×ÜÏîÄ¿ÒÀÀµ
     cd /d .. || ( echo ½øÈë×ÜÏîÄ¿Ä¿Â¼Ê§°Ü & exit /b 1 )
-    call :pnpm_install || ( echo °²×°×ÜÏîÄ¿ÒÀÀµÊ§°Ü & pause & exit /b 1 )
 
     echo Éú³ÉÆô¶¯½Å±¾
     echo @echo off > start.bat

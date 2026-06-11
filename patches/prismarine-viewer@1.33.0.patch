@@ -1,0 +1,68 @@
+diff --git a/viewer/lib/models.js b/viewer/lib/models.js
+index 9f8938ecae21f20e2a8eaafc35ac786cb1d44c2f..4fabe7378bd3cb0fe4b7ed50b648c65abd21ed8d 100644
+--- a/viewer/lib/models.js
++++ b/viewer/lib/models.js
+@@ -130,7 +130,7 @@ function renderLiquid (world, cursor, texture, type, biome, water, attr) {
+     if (!neighbor) continue
+     if (neighbor.type === type) continue
+     if ((neighbor.isCube && !isUp) || neighbor.material === 'plant' || neighbor.getProperties().waterlogged) continue
+-    if (neighbor.position.y < 0) continue
++    // (removed pre-1.18 `neighbor.position.y < 0` void cull — see renderElement)
+ 
+     let tint = [1, 1, 1]
+     if (water) {
+@@ -241,7 +241,10 @@ function renderElement (world, cursor, element, doAO, attr, globalMatrix, global
+       if (!neighbor) continue
+       if (cullIfIdentical && neighbor.type === block.type) continue
+       if (!neighbor.transparent && neighbor.isCube) continue
+-      if (neighbor.position.y < 0) continue
++      // NOTE: upstream had `if (neighbor.position.y < 0) continue` here — a
++      // pre-1.18 assumption that y<0 is the void. On 1.18+ worlds (minY=-64)
++      // it wrongly culled every face adjacent to a y<0 block, so nothing below
++      // y=0 rendered. Out-of-world neighbors are handled by `!neighbor` above.
+     }
+ 
+     const minx = element.from[0]
+diff --git a/viewer/lib/worker.js b/viewer/lib/worker.js
+index b7431677d94be50f78885ac594209e075d47cff3..bb33a98ecbf82bd790e0e76e7331a0040ffe5f96 100644
+--- a/viewer/lib/worker.js
++++ b/viewer/lib/worker.js
+@@ -32,7 +32,7 @@ function setSectionDirty (pos, value = true) {
+   if (!value) {
+     delete dirtySections[key]
+     postMessage({ type: 'sectionFinished', key })
+-  } else if (chunk && chunk.sections[Math.floor(y / 16)]) {
++  } else if (chunk && chunk.sections[Math.floor((y - chunk.minY) / 16)]) {
+     dirtySections[key] = value
+   } else {
+     postMessage({ type: 'sectionFinished', key })
+@@ -74,7 +74,7 @@ setInterval(() => {
+     y = parseInt(y, 10)
+     z = parseInt(z, 10)
+     const chunk = world.getColumn(x, z)
+-    if (chunk && chunk.sections[Math.floor(y / 16)]) {
++    if (chunk && chunk.sections[Math.floor((y - chunk.minY) / 16)]) {
+       delete dirtySections[key]
+       const geometry = getSectionGeometry(x, y, z, world, blocksStates)
+       const transferable = [geometry.positions.buffer, geometry.normals.buffer, geometry.colors.buffer, geometry.uvs.buffer]
+diff --git a/viewer/lib/worldrenderer.js b/viewer/lib/worldrenderer.js
+index 744224a71ec6d73b3da405df9f8a5fdd55dfbd66..50c2348c7dd3756184ffb4164d0f0fdfa2995374 100644
+--- a/viewer/lib/worldrenderer.js
++++ b/viewer/lib/worldrenderer.js
+@@ -127,9 +127,13 @@ class WorldRenderer {
+     for (const worker of this.workers) {
+       worker.postMessage({ type: 'unloadChunk', x, z })
+     }
+-    for (let y = 0; y < 256; y += 16) {
+-      this.setSectionDirty(new Vec3(x, y, z), false)
+-      const key = `${x},${y},${z}`
++    // Remove every section mesh belonging to this column, at any Y. The
++    // upstream `for (y = 0; y < 256)` loop assumed a fixed 0..255 world and
++    // leaked / left ghost meshes for sections outside it (e.g. y<0 on 1.18+).
++    for (const key of Object.keys(this.sectionMeshs)) {
++      const [mx, my, mz] = key.split(',')
++      if (Number(mx) !== x || Number(mz) !== z) continue
++      this.setSectionDirty(new Vec3(x, Number(my), z), false)
+       const mesh = this.sectionMeshs[key]
+       if (mesh) {
+         this.scene.remove(mesh)

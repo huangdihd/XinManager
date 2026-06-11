@@ -1,64 +1,42 @@
-# compiled output
-/dist
-/node_modules
-/build
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
 
 # Logs
 logs
 *.log
-npm-debug.log*
-pnpm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 
-# OS
+# Misc
 .DS_Store
+.fleet
+.idea
 
-# Tests
-/coverage
-/.nyc_output
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# dotenv environment variable files
+# Local env files
 .env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+.env.*
+!.env.example
 
-# temp directory
-.temp
-.tmp
+# Local runtime config (contains password hash & cookie secret)
+config.json
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# Local database & generated prisma client
+prisma/bots.db
+prisma/generated
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
-report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+# Local tooling artifacts
+.codegraph
+tsconfig.tsbuildinfo
 
-/generated/prisma
+# Stray reference sources
+xin/
 
-/config.json
-
-/package_temp
-
-.output
+# Release packaging artifacts
+.release
+package_temp

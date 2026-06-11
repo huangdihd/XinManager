@@ -25,8 +25,8 @@
 ## ✨ Features
 - Manage multiple **xinbot** instances
 - Monitor instance status in real time
-- Access instance terminal remotely
-- Track `2b2t.xin` server status
+- Access instance terminal remotely (with history replay)
+- 3D world viewer for bots
 
 ---
 
