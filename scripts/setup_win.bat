@@ -40,7 +40,9 @@ goto :main
 
 :install_pnpm
     echo 开始安装pnpm
+    set "npm_config_prefix=%node_install_path%"
     npm install -g pnpm || ( echo 安装pnpm失败 & exit /b 1 )
+    set "npm_config_prefix="
     echo pnpm安装完成
     exit /b 0
 
@@ -113,6 +115,11 @@ goto :main
     exit /b 0
 
 :main
+    net session >/dev/null 2>&1 || (
+        echo 请以管理员身份运行此脚本
+        pause
+        exit /b 1
+    )
     echo 开始安装xinManager
     echo 安装目录: %xinManager_install_path%
     if exist "%xinManager_install_path%" (
@@ -163,7 +170,7 @@ goto :main
     echo @echo off > start.bat
     echo set "PATH=%node_install_path%;%%PATH%%" >> start.bat
     echo cd /d %xinManager_install_path% >> start.bat
-    echo pnpm start:installed >> start.bat
+    echo "%node_install_path%\node.exe" server\index.mjs >> start.bat
 
     echo 启动脚本位于:%xinManager_install_path%\start.bat
     call :setup_service || ( echo 设置服务失败 & exit /b 1 )
@@ -173,7 +180,11 @@ goto :main
 
     echo 配置文件地址: %xinManager_install_path%\config.json
 
-    type %xinManager_install_path%\config.json
+    if exist "%xinManager_install_path%\config.json" (
+        type "%xinManager_install_path%\config.json"
+    ) else (
+        echo config.json 将在首次启动后自动生成, 登录密码见该文件
+    )
 
     exit /b 0
 
