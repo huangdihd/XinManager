@@ -21,7 +21,9 @@ import archiver from 'archiver';
 function copyFiles() {
     const copyConfig = {
         recursive: true,
-        verbatimSymlinks: false
+        // Nitro 对多版本依赖（如 debug）用符号链接指向 .nitro/ 下的真实文件，
+        // 必须解引用成真实拷贝，否则 zip 解压到 Windows 后链接失效导致 ERR_MODULE_NOT_FOUND
+        dereference: true
     }
 
     // Nuxt/Nitro 构建产物（server/index.mjs + public/ + nitro.json）
