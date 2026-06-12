@@ -115,7 +115,7 @@ goto :main
     exit /b 0
 
 :main
-    net session >/dev/null 2>&1 || (
+    net session >nul 2>&1 || (
         echo 请以管理员身份运行此脚本
         pause
         exit /b 1
